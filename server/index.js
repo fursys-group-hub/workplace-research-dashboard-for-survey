@@ -260,6 +260,8 @@ app.put('/api/surveys-order', async (req, res) => {
 
 // 정적 프론트(HTML/JS/CSS)도 같은 오리진에서 서빙합니다.
 // 프론트를 별도 호스팅으로 분리하게 되면 이 부분은 지우고 ALLOWED_ORIGIN만 설정하면 됩니다.
+// 백엔드 소스가 있는 server/ 폴더는 웹으로 노출하지 않습니다(소스·설정 보호).
+app.use('/server', (req, res) => res.status(404).end());
 app.use(express.static(path.join(__dirname, '..')));
 
 const PORT = process.env.PORT || 3000;

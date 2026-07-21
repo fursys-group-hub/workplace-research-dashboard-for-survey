@@ -6,3 +6,4 @@ scripts/
 .mcp.json
 setup.sql
 server/.env
+.fursys-deploy-hub/
