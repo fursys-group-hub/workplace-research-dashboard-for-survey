@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설문조사 분석 대시보드 | purple6studio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+<link rel="stylesheet" href="dashboard-for-survey.css">
+<script src="js/api-client.js"></script>
+<script src="js/bootstrap-auth.js"></script>
+<script src="js/saved-list-modal.js"></script>
+</head>
+<body class="dashboard-page">
+
+<div class="page">
+  <header class="dash-header">
+    <div class="header-main">
+      <a href="home.html" class="logo-link" aria-label="purple6studio 홈으로 이동">
+            <img class="logo-img" src="assets/purple6studio_한줄_black.png" alt="purple6studio">
+      </a>
+      <div class="title-wrap">
+        <div id="project-title" class="project-title">설문조사 제목</div>
+        <input id="project-title-input" class="project-title-input" type="text" maxlength="50" hidden>
+        <button id="title-edit-btn" class="title-edit-btn" type="button" aria-label="제목 바꾸기" title="제목 바꾸기">
+            <img class="icon" src="assets/icons/edit_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+        </button>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="dashboard-header-btn" type="button" id="dashboard-data-update-btn">
+        <img class="dashboard-header-btn-icon" src="assets/icons/autorenew_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+        데이터 교체하기
+      </button>
+      <button id="dashboard-list-btn" class="dashboard-header-btn" type="button">
+        <img class="dashboard-header-btn-icon" src="assets/icons/menu_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+        저장된 대시보드 리스트
+        <span class="dashboard-number-tag" id="saved-count">0</span>
+      </button>
+      <button class="dashboard-header-btn is-button-1-black" type="button" id="new-analysis-btn">
+        <img class="dashboard-header-btn-icon" src="assets/icons/new_window_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+        새 대시보드 만들기
+      </button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <div class="left-panel-shell">
+      <aside class="left-panel">
+        <div class="panel-toolbar">
+          <div class="panel-title">문항 리스트</div>
+          <div class="panel-search-wrap">
+            <input type="text" class="panel-search" id="panel-search" placeholder="문항 검색">
+              <img class="panel-search-icon" src="assets/icons/search_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+          </div>
+        </div>
+        <div id="question-tree">
+          <div class="question-list-empty">새 대시보드를 만들거나<br>저장된 대시보드를 열어주세요</div>
+        </div>
+        <div id="selection-status" class="selection-status" aria-live="polite">
+          <span><strong id="selection-count">0</strong>개 선택됨</span>
+          <button type="button" id="selection-clear-btn" class="selection-clear">전체 해제</button>
+        </div>
+      </aside>
+      <button class="panel-toggle" id="panel-toggle" type="button" aria-label="패널 확장">
+              <img class="panel-toggle-icon" src="assets/icons/keyboard_arrow_right_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+    </div>
+
+    <div class="main-shell">
+      <div class="filter-bar">
+        <span class="filter-label">필터</span>
+        <div id="filter-list" class="filter-list"></div>
+        <div id="filter-add" class="filter-add">
+          <button type="button" id="filter-add-btn" class="filter-add-btn">+ 필터 추가</button>
+          <div id="filter-add-menu" class="filter-add-menu"></div>
+        </div>
+        <div class="n-count">N = <strong id="n-count">0</strong></div>
+      </div>
+
+      <main class="main-area">
+      <div class="questions-selected-row">
+        <div class="questions-selected-card">
+          <div class="questions-selected-header">
+            <div class="questions-selected-header-main">
+              <div class="questions-selected-title">보고 싶은 문항</div>
+            </div>
+            <div class="questions-selected-actions">
+              <button type="button" id="target-scale-compare-btn" class="questions-selected-action-btn" disabled>여러 문항 한 번에 비교하기</button>
+              <button type="button" id="target-clear-btn" class="questions-selected-action-btn is-delete">모두 삭제</button>
+            </div>
+          </div>
+          <div class="question-drop-area" id="drop-target" data-zone="target" data-limit="20">
+            <div class="empty-hint">
+              <div class="empty-hint-main">좌측 문항을 여기로 드래그해 주세요.</div>
+            </div>
+          </div>
+        </div>
+        <div class="questions-selected-card">
+          <div class="questions-selected-header">
+            <div class="questions-selected-header-main">
+              <div class="questions-selected-title">그룹별 비교</div>
+            </div>
+            <div class="questions-selected-actions">
+              <button type="button" id="criterion-year-btn" class="questions-selected-action-btn" hidden>연도별 비교하기</button>
+              <button type="button" id="criterion-clear-btn" class="questions-selected-action-btn is-delete">삭제</button>
+            </div>
+          </div>
+          <div class="question-drop-area" id="drop-criterion" data-zone="criterion" data-limit="1">
+            <div class="empty-hint">
+              <div class="empty-hint-main">좌측 문항을 여기로 드래그해 주세요.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-area">
+        <div id="result-container" class="result-container">
+          <div class="result-empty">보고 싶은 문항을 드래그하면 차트가 생성됩니다</div>
+        </div>
+      </div>
+      <div class="main-copyright">(주)퍼시스 Copyright 2026 fursys Inc.</div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="dash-footer">
+    <!-- PPT 내보내기 버튼 — 추후 활성화
+    <button class="dashboard-header-btn is-button-1-black" type="button" id="export-all-pptx-btn">
+      <img class="dashboard-header-btn-icon" src="assets/icons/arrow_downward_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      PPT로 내보내기
+    </button>
+    -->
+  </footer>
+</div>
+
+<div class="modal-backdrop" id="data-update-modal" role="dialog" aria-modal="true" aria-labelledby="data-update-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="data-update-modal-title">데이터 교체하기</div>
+      <button class="modal-close" id="close-data-update-btn" aria-label="닫기">
+        <img class="modal-close-icon" src="assets/icons/close_wght600fill1_40px.svg" alt="">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="data-update-list"></div>
+    </div>
+    <div class="modal-footer data-update-footer">
+      <div class="filter-control category-change" id="category-change">
+        <button type="button" class="filter-control-btn" id="category-change-btn">
+          <span class="filter-control-title" id="category-change-title" hidden>설문 종류</span>
+          <span class="filter-control-summary" id="category-change-summary">설문 종류 변경</span>
+        </button>
+        <div class="filter-menu category-change-menu" id="data-update-category-group" role="group" aria-label="설문 분류">
+          <div class="filter-menu-scroll">
+            <label class="filter-option">
+              <input type="checkbox" data-category="consulting">
+              <span class="filter-option-label">컨설팅</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-category="research">
+              <span class="filter-option-label">리서치</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" data-category="other">
+              <span class="filter-option-label">기타</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="modal-action-btn primary" id="apply-data-update-btn">대시보드 업데이트</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="data-update-file-input" accept=".csv" hidden>
+
+<div class="modal-backdrop" id="other-response-modal" role="dialog" aria-modal="true" aria-labelledby="other-response-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="other-response-modal-title">기타 응답</div>
+      <button class="modal-close" id="close-other-response-btn" aria-label="닫기">
+        <img class="modal-close-icon" src="assets/icons/close_wght600fill1_40px.svg" alt="">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="other-modal-subtitle" id="other-response-modal-subtitle"></div>
+      <ul class="other-modal-list" id="other-response-modal-list"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="scale-compare-modal" role="dialog" aria-modal="true" aria-labelledby="scale-compare-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="scale-compare-modal-title">다른 문항과 묶어서 보기</div>
+      <button class="modal-close" id="close-scale-compare-btn" aria-label="닫기">
+        <img class="modal-close-icon" src="assets/icons/close_wght600fill1_40px.svg" alt="">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="scale-compare-modal-note" id="scale-compare-modal-note"></div>
+      <div class="scale-compare-modal-list" id="scale-compare-modal-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="modal-action-btn" id="cancel-scale-compare-btn">취소</button>
+      <button type="button" class="modal-action-btn primary" id="apply-scale-compare-btn">적용</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="group-config-modal" role="dialog" aria-modal="true" aria-labelledby="group-config-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="group-config-modal-title">범례 그룹 편집</div>
+      <button class="modal-close" id="close-group-config-btn" aria-label="닫기">
+        <img class="modal-close-icon" src="assets/icons/close_wght600fill1_40px.svg" alt="">
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="group-config-list" class="legend group-config-list"></div>
+    </div>
+    <div class="modal-footer group-config-footer">
+      <button type="button" class="modal-action-btn group-config-create-btn" id="group-config-add-btn">
+        <img class="group-config-create-icon" src="assets/icons/add_40dp_151515_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+        <span>그룹 만들기</span>
+      </button>
+      <div class="group-config-footer-actions">
+        <button type="button" class="modal-action-btn group-config-reset-btn" id="group-config-reset-btn">전체 해제</button>
+        <button type="button" class="modal-action-btn primary group-config-apply-btn" id="group-config-apply-btn">편집 완료</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/libs/dom-to-image-more.min.js"></script>
+<script src="assets/libs/html2canvas.min.js"></script>
+<script src="assets/libs/PptxGenJS-4.0.1/PptxGenJS-4.0.1/dist/pptxgen.bundle.js"></script>
+<script src="js/visualizations.js"></script>
+<script>
+  try {
+    window.initSavedListModal && window.initSavedListModal({
+      openButtonIds: ['dashboard-list-btn'],
+      countBadgeIds: ['saved-count'],
+      emptyHtml: '아직 저장된 대시보드가 없습니다.<br>대시보드를 저장하면 여기에 쌓입니다.'
+    });
+  } catch (_) {}
+</script>
+</body>
+</html>

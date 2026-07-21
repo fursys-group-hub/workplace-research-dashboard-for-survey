@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 | purple6studio</title>
+<link rel="stylesheet" href="dashboard-for-survey.css">
+<style>
+  body.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #F8F8F8;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 360px;
+    padding: 48px 40px 40px;
+    background: var(--White);
+    border-radius: var(--radius-16);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .login-logo {
+    display: block;
+    height: 20px;
+    width: auto;
+    margin: 0 auto 36px;
+  }
+  .login-label {
+    font-size: var(--label-1-size);
+    font-weight: var(--font-weight-medium);
+    color: var(--neutral-700);
+    margin-bottom: 8px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--radius-8);
+    font-size: var(--body-2-size);
+    font-family: inherit;
+    background: var(--White);
+    color: var(--neutral-900);
+    transition: border-color .15s;
+    box-sizing: border-box;
+  }
+  .login-input:focus {
+    outline: none;
+    border-color: var(--neutral-900);
+  }
+  .login-input.error {
+    border-color: var(--error-text);
+  }
+  .login-error {
+    color: var(--error-text);
+    font-size: var(--caption-1-size);
+    margin-top: 8px;
+    min-height: 18px;
+    display: none;
+  }
+  .login-error.show {
+    display: block;
+  }
+  .login-btn {
+    margin-top: 24px;
+    width: 100%;
+    padding: 12px;
+    background: #151515;
+    color: var(--White);
+    border: none;
+    border-radius: var(--radius-8);
+    font-size: var(--body-2-size);
+    font-weight: var(--font-weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .login-btn:hover { background: var(--neutral-800); }
+  .login-btn:disabled {
+    background: var(--neutral-300);
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body class="login-page">
+
+<div class="login-card">
+  <img class="login-logo" src="assets/purple6studio_한줄_black.png" alt="purple6studio">
+
+  <div class="login-label">비밀번호</div>
+  <input
+    id="pw-input"
+    class="login-input"
+    type="password"
+    placeholder="비밀번호를 입력하세요"
+    autocomplete="current-password"
+  >
+  <div id="login-error" class="login-error"></div>
+
+  <button id="login-btn" class="login-btn" type="button">로그인</button>
+</div>
+
+<script>
+  const _API_BASE = '/api'; // 배포 위치가 바뀌면 이 값만 수정하면 됩니다.
+
+  // 이미 로그인 상태면 바로 이동
+  fetch(_API_BASE + '/session', { credentials: 'include' })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.authenticated) window.location.replace('home.html');
+    })
+    .catch(function() {});
+
+  const pwInput = document.getElementById('pw-input');
+  const loginBtn = document.getElementById('login-btn');
+  const errorDiv = document.getElementById('login-error');
+
+  function showError(msg) {
+    errorDiv.textContent = msg;
+    errorDiv.classList.add('show');
+    pwInput.classList.add('error');
+  }
+
+  function clearError() {
+    errorDiv.classList.remove('show');
+    pwInput.classList.remove('error');
+  }
+
+  async function doLogin() {
+    clearError();
+    const password = pwInput.value.trim();
+    if (!password) {
+      showError('비밀번호를 입력해 주세요.');
+      pwInput.focus();
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = '로그인 중…';
+
+    let ok = false;
+    try {
+      const res = await fetch(_API_BASE + '/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password })
+      });
+      ok = res.ok;
+    } catch (_) {
+      ok = false;
+    }
+
+    if (!ok) {
+      showError('비밀번호가 올바르지 않습니다.');
+      pwInput.value = '';
+      pwInput.focus();
+      loginBtn.disabled = false;
+      loginBtn.textContent = '로그인';
+      return;
+    }
+
+    window.location.replace('home.html');
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  pwInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+</script>
+</body>
+</html>

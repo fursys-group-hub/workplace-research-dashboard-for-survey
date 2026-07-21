@@ -1,0 +1,17 @@
+{
+  "name": "dashboard-for-survey-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "설문 대시보드 백엔드 - 회사 Postgres(app_260712_tosb 스키마) 연동",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  }
+}
